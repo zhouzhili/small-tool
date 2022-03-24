@@ -5,5 +5,3 @@ set -e
 
 # 百度链接推送
 curl -H 'Content-Type:text/plain' --data-binary @urls.txt "http://data.zz.baidu.com/urls?site=https://www.mapcenter.cn&token=UfF13gyX0mByUsvd"
-
-rm -rf urls.txt # 删除文件

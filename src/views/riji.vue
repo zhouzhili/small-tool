@@ -54,13 +54,13 @@ async function writeArr(txt, elsWrap) {
   for (const char of arr) {
     if (stopWrite) {
       break
+    } else {
+      await createWriter(char, elsWrap)
     }
-    await createWriter(char, elsWrap)
   }
 }
 
 async function writeTime(now) {
-  console.log(now)
   const weekMap = ['日', '一', '二', '三', '四', '五', '六']
   const els = ['year', 'week', 'weather']
   els.forEach((id) => {
@@ -73,6 +73,22 @@ async function writeTime(now) {
   await writeArr(weather.value, 'weather')
 }
 
+async function writeTxt(txt) {
+  const arr = txt.split('\n')
+  for (const section of arr) {
+    if (stopWrite) {
+      break
+    } else {
+      const div = document.createElement('div')
+      const id = `section-${Math.random().toString()}`
+      div.id = id
+      div.className = 'paragraph'
+      document.getElementById('char-content').appendChild(div)
+      await writeArr(section, id)
+    }
+  }
+}
+
 const onBeginWrite = async () => {
   stopWrite = true
   document.getElementById('char-content').innerHTML = ''
@@ -80,17 +96,16 @@ const onBeginWrite = async () => {
   stopWrite = false
   await writeTime(now.value)
   const txt = input.value.trimEnd()
-  await writeArr(txt, 'char-content')
+  await writeTxt(txt)
   await writeArr(user.value, 'signature-content')
 }
 
 const onResetNote = async () => {
   stopWrite = true
-  Array.from(document.querySelectorAll('.char-item'))
-    .concat(Array.from(document.querySelectorAll('.bd-item')))
-    .forEach((el) => {
-      el.parentNode.removeChild(el)
-    })
+  Array.from(document.querySelectorAll('.char-item,.bd-item,.paragraph'))
+  .forEach((el) => {
+    el.parentNode.removeChild(el)
+  })
   await sleep(100)
 }
 </script>
@@ -183,7 +198,6 @@ const onResetNote = async () => {
       align-items: flex-start;
     }
     .el-button {
-      width: 100px;
       margin-top: 8px;
       margin-left: 50px;
     }
@@ -216,11 +230,11 @@ const onResetNote = async () => {
     background-size: contain;
     background-repeat: no-repeat;
     position: relative;
-    #char-content {
+    padding: 118px 65px 0 85px;
+    .paragraph {
       display: flex;
       flex-wrap: wrap;
       align-content: flex-start;
-      padding: 120px 65px 27px 85px;
     }
 
     .time-content {
@@ -238,7 +252,8 @@ const onResetNote = async () => {
     }
     #signature-content {
       display: flex;
-      margin-left: 400px;
+      margin-left: 330px;
+      margin-top: 30px;
       padding-right: 65px;
     }
     .footer {

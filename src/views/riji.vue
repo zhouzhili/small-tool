@@ -3,16 +3,16 @@ import HanziWriter from 'hanzi-writer'
 
 let stopWrite = false
 
-const input = ref('不幸的是我们等了那么多年，幸运的是我们那么多年过去还一直在一起')
+const input = ref('虽说路途遥远，但已经上路，正在走来。告诉你，它决不会后退，也不会停下')
 const now = ref(new Date())
 const weather = ref('晴')
 const footerNum = ref('0')
-const user = ref('王二狗')
+const user = ref('狄更斯')
 
 const writeSetting = {
-  width: 24,
-  height: 24,
-  padding: 1,
+  width: 28,
+  height: 28,
+  padding: 3,
   showOutline: false,
   showCharacter: false,
   strokeAnimationSpeed: 15, // 5x normal speed
@@ -102,8 +102,7 @@ const onBeginWrite = async () => {
 
 const onResetNote = async () => {
   stopWrite = true
-  Array.from(document.querySelectorAll('.char-item,.bd-item,.paragraph'))
-  .forEach((el) => {
+  Array.from(document.querySelectorAll('.char-item,.bd-item,.paragraph')).forEach((el) => {
     el.parentNode.removeChild(el)
   })
   await sleep(100)
@@ -166,11 +165,11 @@ const onResetNote = async () => {
         </el-col>
       </el-row>
       <el-row>
-        <el-col :span="4">
-          <el-button type="primary" @click="onBeginWrite">书写</el-button>
-        </el-col>
-        <el-col :span="4">
-          <el-button type="primary" @click="onResetNote">重置</el-button>
+        <el-col :span="8">
+          <div class="btn-wrap">
+            <el-button type="primary" @click="onBeginWrite">书写</el-button>
+            <el-button type="primary" @click="onResetNote">重置</el-button>
+          </div>
         </el-col>
       </el-row>
     </div>
@@ -197,9 +196,8 @@ const onResetNote = async () => {
     .textarea-item {
       align-items: flex-start;
     }
-    .el-button {
-      margin-top: 8px;
-      margin-left: 50px;
+    .btn-wrap{
+      padding-left: 50px;
     }
   }
   * {

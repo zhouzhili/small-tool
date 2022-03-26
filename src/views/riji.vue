@@ -1,23 +1,41 @@
 <script setup>
 import HanziWriter from 'hanzi-writer'
+import dayjs from 'dayjs'
 
 let stopWrite = false
 
-const input = ref('虽说路途遥远，但已经上路，正在走来。告诉你，它决不会后退，也不会停下')
-const now = ref(new Date())
-const weather = ref('晴')
-const footerNum = ref('0')
-const user = ref('狄更斯')
+const input = ref(getDateFormStore('sent'))
+const now = ref(new Date(getDateFormStore('date')))
+const weather = ref(getDateFormStore('weather'))
+const footerNum = ref(getDateFormStore('footerNum'))
+const user = ref(getDateFormStore('user'))
+const visible = ref('visible')
 
 const writeSetting = {
-  width: 28,
-  height: 28,
-  padding: 3,
+  width: 40,
+  height: 40,
+  padding: 4,
   showOutline: false,
   showCharacter: false,
   strokeAnimationSpeed: 15, // 5x normal speed
   delayBetweenStrokes: 2, // milliseconds
   strokeColor: '#000'
+}
+
+function getDateFormStore(key) {
+  return localStorage.getItem(key)
+}
+
+function setDataToStorage(key, val) {
+  localStorage.setItem(key, val)
+}
+
+function storeData() {
+  setDataToStorage('sent', input.value)
+  setDataToStorage('user', user.value)
+  setDataToStorage('weather', weather.value)
+  setDataToStorage('date', dayjs(now.value).format('YYYY-MM-DD'))
+  setDataToStorage('footerNum', footerNum.value)
 }
 
 function sleep(ms) {
@@ -33,14 +51,15 @@ function checkChinese(str) {
   return reg.test(str)
 }
 
-function createWriter(char, charWarpEl) {
+function createWriter(char, charWarpEl, isTime) {
   const div = document.createElement('div')
   const id = Math.random().toString()
   div.id = id
   document.getElementById(charWarpEl).appendChild(div)
-  if (checkChinese(char)) {
+  if (checkChinese(char) && char !== '玦') {
     div.className = 'char-item'
-    const writer = HanziWriter.create(id, char, writeSetting)
+    const setting = isTime ? { ...writeSetting, width: 28, height: 28, padding: 3 } : writeSetting
+    const writer = HanziWriter.create(id, char, setting)
     return writer.animateCharacter()
   } else {
     div.className = 'bd-item'
@@ -49,13 +68,13 @@ function createWriter(char, charWarpEl) {
   }
 }
 
-async function writeArr(txt, elsWrap) {
+async function writeArr(txt, elsWrap, isTime) {
   const arr = txt.split('')
   for (const char of arr) {
     if (stopWrite) {
       break
     } else {
-      await createWriter(char, elsWrap)
+      await createWriter(char, elsWrap, isTime)
     }
   }
 }
@@ -68,9 +87,9 @@ async function writeTime(now) {
   })
   const yearStr = `${now.getFullYear()}年${now.getMonth() + 1}月${now.getDate()}日`
   const week = `星期${weekMap[now.getDay()]}`
-  await writeArr(yearStr, 'year')
-  await writeArr(week, 'week')
-  await writeArr(weather.value, 'weather')
+  await writeArr(yearStr, 'year', true)
+  await writeArr(week, 'week', true)
+  await writeArr(weather.value, 'weather', true)
 }
 
 async function writeTxt(txt) {
@@ -98,6 +117,7 @@ const onBeginWrite = async () => {
   const txt = input.value.trimEnd()
   await writeTxt(txt)
   await writeArr(user.value, 'signature-content')
+  storeData()
 }
 
 const onResetNote = async () => {
@@ -106,6 +126,10 @@ const onResetNote = async () => {
     el.parentNode.removeChild(el)
   })
   await sleep(100)
+}
+
+const onHideSent = () => {
+  visible.value = visible.value === 'visible' ? 'hidden' : 'visible'
 }
 </script>
 
@@ -165,10 +189,11 @@ const onResetNote = async () => {
         </el-col>
       </el-row>
       <el-row>
-        <el-col :span="8">
+        <el-col :span="12">
           <div class="btn-wrap">
             <el-button type="primary" @click="onBeginWrite">书写</el-button>
             <el-button type="primary" @click="onResetNote">重置</el-button>
+            <el-button type="primary" @click="onHideSent">隐藏正文</el-button>
           </div>
         </el-col>
       </el-row>
@@ -196,7 +221,7 @@ const onResetNote = async () => {
     .textarea-item {
       align-items: flex-start;
     }
-    .btn-wrap{
+    .btn-wrap {
       padding-left: 50px;
     }
   }
@@ -205,11 +230,11 @@ const onResetNote = async () => {
   }
 
   .char-item {
-    height: 30px;
+    // height: 30px;
   }
   .bd-item,
   .char-item {
-    height: 28px;
+    // height: 28px;
     display: flex;
     justify-content: center;
     align-items: center;
@@ -234,6 +259,9 @@ const onResetNote = async () => {
       flex-wrap: wrap;
       align-content: flex-start;
     }
+    #char-content {
+      visibility: v-bind(visible);
+    }
 
     .time-content {
       position: absolute;
@@ -246,7 +274,7 @@ const onResetNote = async () => {
     }
     #week,
     #year {
-      margin-right: 50px;
+      margin-right: 20px;
     }
     #signature-content {
       display: flex;

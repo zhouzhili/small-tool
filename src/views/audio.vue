@@ -1,35 +1,69 @@
 <script setup>
-const audioStr = ref('')
+import { ElMessage } from 'element-plus'
+import { downloadMP3 } from '@/utils/index.js'
 const audio = ref('')
+const uploadRef = ref('')
+
 const onConvert = () => {
-  audio.value = ''
-  audio.value = audioStr.value
+  const file = uploadRef.value.uploadFiles[0]
+  if (file) {
+    audio.value = ''
+    const reader = new FileReader()
+    reader.readAsText(file.raw)
+    reader.onload = function (rea) {
+      const result = rea.target.result
+      try {
+        const data = JSON.parse(result)
+        if (data.log.entries) {
+          const media = data.log.entries.find((s) => s._resourceType === 'media')
+          if (media) {
+            const audioText = media.response.content.text
+            audio.value = `data:audio/mpeg;base64,${audioText}`
+          }
+        }
+      } catch (e) {
+        ElMessage.error('转换JSON失败')
+        console.log(e)
+      }
+    }
+  }
+}
+const onDownload = () => {
+  if (audio.value) {
+    downloadMP3(audio.value, `录音-${Date.now()}.mp3`)
+  }
 }
 </script>
 
 <template>
   <div class="audio">
     <el-row>
+      <el-col :span="24" class="title">
+        <h4>根据har文件提取中的音频数据</h4>
+        <span class="tips">可从阿里云语音合成界面白嫖，然后保存har文件到本地</span>
+      </el-col>
+    </el-row>
+    <el-row>
       <el-col :span="24">
-        <div class="tips">
-          <span>base64字符串</span>
-          <span class="example">示例：data:audio/mpeg;base64,....</span>
+        <div>
+          <el-upload action="" :auto-upload="false" ref="uploadRef" :limit="1" accept=".har">
+            <el-button>选择文件</el-button>
+          </el-upload>
         </div>
       </el-col>
     </el-row>
+
     <el-row>
-      <el-col :span="24">
-        <el-input type="textarea" :rows="8" v-model="audioStr"></el-input>
-      </el-col>
-    </el-row>
-    <el-row>
-      <el-col :span="24">
+      <el-col :span="2">
         <el-button type="primary" @click="onConvert">转换</el-button>
       </el-col>
+      <el-col :span="2">
+        <el-button type="primary" @click="onDownload">下载</el-button>
+      </el-col>
     </el-row>
     <el-row>
       <el-col :span="24">
-        <audio controls="controls" autobuffer="autobuffer"  v-if="audio">
+        <audio controls="controls" autobuffer="autobuffer" v-if="audio">
           <source :src="audio" />
         </audio>
       </el-col>
@@ -39,10 +73,12 @@ const onConvert = () => {
 
 <style lang="less" scoped>
 .audio {
-  .el-row{
+  .el-row {
     margin: 16px 0;
-    .tips{
-      .example{
+    .title {
+      display: flex;
+      align-items: center;
+      .tips {
         opacity: 0.5;
         margin-left: 8px;
       }

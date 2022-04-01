@@ -1,33 +1,31 @@
-setTimeout(() => {
-  const el = document.querySelector('#xqtitle')
-  if (el) {
-    const h1 = document.createElement('h1')
-    h1.style = `width: 510px;
-    margin-top: 35px;
-    margin-right: auto;
-    margin-left: 38px;
-    padding-right: 50px;
-    padding-left: 50px;
-    font-size: 18px;
-    font-weight: normal;
-    color: #000;
-    letter-spacing: 1px;
-    line-height: 38px;
-    text-align: justify;
-    text-justify: inter-ideograph;
-    border-top-width: 1px;
-    border-right-width: 1px;
-    border-left-width: 1px;
-    border-top-style: solid;
-    border-right-style: solid;
-    border-left-style: solid;
-    border-top-color: #e6e6e6;
-    border-right-color: #e6e6e6;
-    border-left-color: #e6e6e6;
-    padding-top: 30px;
-    min-height: 40px;`
-    h1.innerHTML = el.innerHTML
-    el.parentElement.append(h1)
-    el.parentNode.removeChild(el)
+function download(url, name) {
+  const a = document.createElement('a')
+  a.download = name
+  a.href = url
+  document.body.appendChild(a)
+  a.click()
+  document.body.removeChild(a)
+}
+
+function base64ToBlob(base64) {
+  const arr = base64.split(',')
+  const mime = arr[0].split(';')[0].split(':')[1]
+  const byteStr = atob(arr[1])
+  const len = byteStr.length
+  const intArray = new Uint8Array(len)
+  for (let i = 0; i < len; i++) {
+    intArray[i] = byteStr.charCodeAt(i)
   }
-}, 50)
+  return new Blob([intArray], { type: mime })
+}
+
+/**
+ * base64转mp3下载
+ * @param {*} base64 
+ * @param {*} name 
+ */
+export function downloadMP3(base64, name) {
+  const blob = base64ToBlob(base64)
+  const url = URL.createObjectURL(blob)
+  download(url, name)
+}

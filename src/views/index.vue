@@ -1,16 +1,25 @@
 <script setup>
 import { reactive } from 'vue'
 import { useRouter } from 'vue-router'
+import icon from '@/components/icon.vue'
+
 const router = useRouter()
 
 const navList = reactive([
   {
     name: '朋友圈绿幕',
-    url: 'wechat'
+    url: 'wechat',
+    icon: 'icon-shejiaotubiao-02'
   },
   {
     name: '日记生成器',
-    url: 'riji'
+    url: 'riji',
+    icon: 'icon-qunfariji'
+  },
+  {
+    name: 'base64转语音',
+    url: 'audio',
+    icon: 'icon-MPIS-TTS'
   }
 ])
 const onNav = (url) => {
@@ -22,32 +31,38 @@ const onNav = (url) => {
   <div class="home">
     <el-row class="index">
       <el-col v-for="item in navList" :key="item.url" :span="4" :offset="1">
-        <el-card :body-style="{ padding: '0px' }">
-          <div :class="['img', item.url]"></div>
-          <div style="padding: 14px">
-            <span style="margin-right: 16px">{{ item.name }}</span>
-            <el-button type="text" @click="onNav(item.url)">前往</el-button>
-          </div>
-        </el-card>
+        <div class="item" @click="onNav(item.url)">
+          <icon :iconName="item.icon"></icon>
+          <span class="name">{{ item.name }}</span>
+        </div>
       </el-col>
     </el-row>
   </div>
 </template>
 
 <style lang="less" scoped>
-.home{
-  .center{
+.home {
+  .center {
     text-align: center;
   }
-  .img{
-    height: 150px;
-    background-size: 100%;
-  }
-  .wechat{
-    background-image: url('../assets/wechat.png');
-  }
-  .riji{
-    background-image: url('../assets/riji.png');
+  .index{
+    .item{
+      display: flex;
+      align-items: center;
+      padding: 8px 16px;
+      border:1px solid #ddd;
+      border-radius: 4px;
+      box-shadow: 0 0 6px #e1e1e1;
+      cursor: pointer;
+      .icon{
+        font-size: 28px;
+        margin-right: 8px;
+      }
+      &:hover{
+        box-shadow: 0 0 12px #67c23a;
+        border-color: #67c23a;
+      }
+    }
   }
 }
 </style>

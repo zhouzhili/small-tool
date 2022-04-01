@@ -1,13 +1,22 @@
-<script setup></script>
+<script setup>
+import { useRouter, useRoute } from 'vue-router'
+import icon from '@/components/icon.vue'
+const router = useRouter()
+const route = useRoute()
+
+const showBack = computed(() => route.path !== '/')
+
+const onBack = () => router.go(-1)
+</script>
 
 <template>
   <div class="common-layout">
     <el-container>
       <el-header>
         <div class="center">
-          <h3>工具集合</h3>
+          <icon iconName="icon-xitongfanhui" v-show="showBack" @click="onBack"></icon>
+          <div>工具集合</div>
         </div>
-        <el-divider />
       </el-header>
       <el-main>
         <router-view></router-view>
@@ -17,11 +26,20 @@
 </template>
 
 <style lang="less">
-.common-layout{
-  .el-header{
+.common-layout {
+  .el-header {
     padding: 0;
-    .center{
-      padding: 0 80px ;
+    border-bottom: 1px solid #ddd;
+    .center {
+      padding: 0 60px;
+      font-weight: 600;
+      height: 60px;
+      display: flex;
+      align-items: center;
+      .icon{
+        margin-right: 16px;
+        cursor: pointer;
+      }
     }
   }
 }

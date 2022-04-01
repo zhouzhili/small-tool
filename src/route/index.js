@@ -15,6 +15,10 @@ const router = createRouter({
     {
       path: '/riji',
       component: () => import('../views/riji.vue')
+    },
+    {
+      path: '/audio',
+      component: () => import('../views/audio.vue')
     }
   ]
 })

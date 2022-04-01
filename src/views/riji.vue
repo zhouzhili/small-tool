@@ -17,7 +17,7 @@ const writeSetting = {
   padding: 4,
   showOutline: false,
   showCharacter: false,
-  strokeAnimationSpeed: 15, // 5x normal speed
+  strokeAnimationSpeed: 55, // 5x normal speed
   delayBetweenStrokes: 2, // milliseconds
   strokeColor: '#000'
 }

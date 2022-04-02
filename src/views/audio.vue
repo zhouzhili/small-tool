@@ -4,6 +4,14 @@ import { downloadMP3 } from '@/utils/index.js'
 const audio = ref('')
 const uploadRef = ref('')
 
+const handleExceed = files=>{
+  uploadRef.value.clearFiles()
+  audio.value = ''
+  const file = files[0]
+  file.uid = Date.now()
+  uploadRef.value.handleStart(file)
+}
+
 const onConvert = () => {
   const file = uploadRef.value.uploadFiles[0]
   if (file) {
@@ -40,13 +48,13 @@ const onDownload = () => {
     <el-row>
       <el-col :span="24" class="title">
         <h4>根据har文件提取中的音频数据</h4>
-        <span class="tips">可从阿里云语音合成界面白嫖，然后保存har文件到本地</span>
+        <span class="tips">可从阿里云语音合成界面白嫖，然后将接口调用信息保存har文件到本地</span>
       </el-col>
     </el-row>
     <el-row>
       <el-col :span="24">
         <div>
-          <el-upload action="" :auto-upload="false" ref="uploadRef" :limit="1" accept=".har">
+          <el-upload action="" :auto-upload="false" :on-exceed="handleExceed" :limit="1" ref="uploadRef" accept=".har">
             <el-button>选择文件</el-button>
           </el-upload>
         </div>

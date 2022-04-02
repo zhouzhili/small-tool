@@ -7,8 +7,10 @@ let stopWrite = false
 const input = ref(getDateFormStore('sent'))
 const now = ref(new Date(getDateFormStore('date')))
 const weather = ref(getDateFormStore('weather'))
-const footerNum = ref(getDateFormStore('footerNum'))
+const footerNum = ref(getDateFormStore('footerNum') || 1)
 const user = ref(getDateFormStore('user'))
+const fontSize = ref(getDateFormStore('fontSize') || 40)
+const speed = ref(getDateFormStore('speed') || 55)
 const visible = ref('visible')
 
 const writeSetting = {
@@ -36,6 +38,8 @@ function storeData() {
   setDataToStorage('weather', weather.value)
   setDataToStorage('date', dayjs(now.value).format('YYYY-MM-DD'))
   setDataToStorage('footerNum', footerNum.value)
+  setDataToStorage('fontSize', fontSize.value)
+  setDataToStorage('speed', speed.value)
 }
 
 function sleep(ms) {
@@ -58,7 +62,13 @@ function createWriter(char, charWarpEl, isTime) {
   document.getElementById(charWarpEl).appendChild(div)
   if (checkChinese(char) && char !== '玦') {
     div.className = 'char-item'
-    const setting = isTime ? { ...writeSetting, width: 28, height: 28, padding: 3 } : writeSetting
+    const defSetting = {
+      ...writeSetting,
+      width: fontSize.value,
+      height: fontSize.value,
+      strokeAnimationSpeed: speed.value
+    }
+    const setting = isTime ? { ...defSetting,width: 28,height: 28, padding: 3 } : defSetting
     const writer = HanziWriter.create(id, char, setting)
     return writer.animateCharacter()
   } else {
@@ -171,6 +181,18 @@ const onHideSent = () => {
           <div class="form-item">
             <label>页码：</label>
             <el-input-number v-model="footerNum" placeholder="输入天气" />
+          </div>
+        </el-col>
+        <el-col :span="6" :sm="12">
+          <div class="form-item">
+            <label>字号：</label>
+            <el-input-number v-model="fontSize" />
+          </div>
+        </el-col>
+        <el-col :span="6" :sm="12">
+          <div class="form-item">
+            <label>速度：</label>
+            <el-input-number :step="5" v-model="speed" />
           </div>
         </el-col>
       </el-row>
